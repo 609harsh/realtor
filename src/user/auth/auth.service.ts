@@ -47,13 +47,13 @@ export class AuthService {
     const user=await this.prismaService.user.findFirst({where:{email:email}})
     if(!user)throw new NotFoundException("User Not found");
 
-    const [salt,storedHash]=user[0].password.split('.');
+    const [salt,storedHash]=user.password.split('.');
     const hash=(await scrypt(password,salt,32)) as Buffer;
     if(storedHash!==hash.toString('hex'))throw new BadRequestException("Password or email do not match")
 
     const token=await jwt.sign({
-      name:user[0].name,
-      id:user[0].id
+      name:user.name,
+      id:user.id
     },process.env.JWT_TOKEN,{
       expiresIn:360000
     });
